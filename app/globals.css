@@ -1,26 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent: #4F46E5;
+  --accent-light: #EEF2FF;
+  --accent-text: #FFFFFF;
+  --bg: #FFFFFF;
+  --bg-surface: #F6F7F8;
+  --border-default: #E5E7EB;
+  --border-subtle: #F3F4F6;
+  --error: #EF4444;
+  --error-bg: #FEF2F2;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-disabled: #D1D5DB;
+  --warning: #F59E0B;
+  --warning-bg: #FFFBEB;
+  --success: #22C55E;
+  --success-bg: #F0FDF4;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-heading: "Bricolage Grotesque", sans-serif;
+  --font-body: "DM Sans", sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-text: var(--accent-text);
+  --color-bg: var(--bg);
+  --color-bg-surface: var(--bg-surface);
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-error: var(--error);
+  --color-error-bg: var(--error-bg);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disabled: var(--text-disabled);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: "DM Sans", sans-serif;
 }
