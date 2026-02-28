@@ -53,6 +53,27 @@
   --radius-xl: var(--radius-xl);
 }
 
+/* ── Dark mode token overrides ───────────────────────────── */
+.dark {
+  --accent: #6366F1;
+  --accent-light: #1e1b4b;
+  --accent-text: #FFFFFF;
+  --bg: #1c1c1f;
+  --bg-surface: #111114;
+  --border-default: #303036;
+  --border-subtle: #252528;
+  --error: #f87171;
+  --error-bg: #2d1515;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-disabled: #3f3f46;
+  --warning: #fbbf24;
+  --warning-bg: #291d09;
+  --success: #4ade80;
+  --success-bg: #0a2314;
+}
+
 body {
   background-color: var(--bg-surface);
   color: var(--text-primary);

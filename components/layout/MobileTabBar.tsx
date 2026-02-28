@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutDashboard, LayoutTemplate, Plus, Settings } from "lucide-react";
+import { FileText, LayoutDashboard, LayoutTemplate, Moon, Plus, Sun } from "lucide-react";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 export function MobileTabBar() {
   const pathname = usePathname();
+  const { theme, toggle } = useTheme();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <nav className="md:hidden flex items-center justify-around bg-bg border-t border-border-subtle h-16 px-6 shrink-0">
+    <nav className="md:hidden flex items-center justify-around bg-bg border-t border-border-subtle h-16 px-4 shrink-0">
       <Link href="/" className={`flex flex-col items-center gap-1 ${isActive("/") ? "text-accent" : "text-text-disabled"}`}>
         <LayoutDashboard size={22} strokeWidth={isActive("/") ? 2.5 : 2} />
         <span className="text-[11px] font-body font-medium">Home</span>
@@ -29,10 +31,14 @@ export function MobileTabBar() {
         <LayoutTemplate size={22} strokeWidth={2} />
         <span className="text-[11px] font-body font-medium">Templates</span>
       </Link>
-      <Link href="/settings" className={`flex flex-col items-center gap-1 ${isActive("/settings") ? "text-accent" : "text-text-disabled"}`}>
-        <Settings size={22} strokeWidth={2} />
-        <span className="text-[11px] font-body font-medium">Settings</span>
-      </Link>
+      <button
+        onClick={toggle}
+        aria-label="Toggle theme"
+        className="flex flex-col items-center gap-1 text-text-disabled hover:text-text-secondary transition-colors cursor-pointer"
+      >
+        {theme === "dark" ? <Sun size={22} strokeWidth={2} /> : <Moon size={22} strokeWidth={2} />}
+        <span className="text-[11px] font-body font-medium">Theme</span>
+      </button>
     </nav>
   );
 }
