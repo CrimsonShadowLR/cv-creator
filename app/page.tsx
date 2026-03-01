@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Download, Upload } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ResumeCard } from "@/components/resume/ResumeCard";
-import { getAllResumes, deleteResume, seedIfEmpty } from "@/lib/db";
+import { getAllResumes, saveResume, deleteResume, seedIfEmpty } from "@/lib/db";
 import { mockResumes } from "@/lib/mock-data";
 import type { Resume } from "@/types/resume";
 
 export default function DashboardPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     seedIfEmpty(mockResumes)
@@ -25,6 +27,37 @@ export default function DashboardPage() {
   const handleDelete = async (id: string) => {
     await deleteResume(id);
     setResumes((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const handleExport = async () => {
+    const data = await getAllResumes();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cv-helper-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      const parsed = JSON.parse(text);
+      const data: Resume[] = Array.isArray(parsed) ? parsed : [parsed];
+      for (const resume of data) {
+        await saveResume(resume);
+      }
+      const all = await getAllResumes();
+      setResumes(all);
+    } catch {
+      setImportError("Invalid JSON file.");
+    } finally {
+      e.target.value = "";
+    }
   };
 
   const total = resumes.length;
@@ -90,6 +123,38 @@ export default function DashboardPage() {
                 />
               ))}
             </div>
+          )}
+        </div>
+        {/* DEBUG — remove before production */}
+        <div className="flex flex-col gap-2 border border-dashed border-border-default rounded-[var(--radius-md)] p-4">
+          <p className="font-body text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+            Debug Tools
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleExport}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border border-border-default bg-bg text-text-secondary text-[12px] font-medium font-body hover:bg-bg-surface transition-colors cursor-pointer"
+            >
+              <Download size={13} />
+              Export JSON
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border border-border-default bg-bg text-text-secondary text-[12px] font-medium font-body hover:bg-bg-surface transition-colors cursor-pointer"
+            >
+              <Upload size={13} />
+              Import JSON
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={handleImport}
+            />
+          </div>
+          {importError && (
+            <p className="font-body text-[12px] text-error">{importError}</p>
           )}
         </div>
       </div>
