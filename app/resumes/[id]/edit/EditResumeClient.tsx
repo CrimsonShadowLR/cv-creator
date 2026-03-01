@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, Save } from "lucide-react";
+import { ArrowLeft, Eye, Save, Check } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/Button";
 import { PersonalInfoForm } from "@/components/forms/PersonalInfoForm";
@@ -10,6 +10,7 @@ import { EducationSection } from "@/components/forms/EducationSection";
 import { ExperienceSection } from "@/components/forms/ExperienceSection";
 import { CoursesSection } from "@/components/forms/CoursesSection";
 import { ProjectsSection } from "@/components/forms/ProjectsSection";
+import { getResume, saveResume } from "@/lib/db";
 import type { Resume } from "@/types/resume";
 
 const TABS = [
@@ -22,17 +23,72 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-interface EditResumeClientProps {
-  resume: Resume;
+function todayString() {
+  return new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export function EditResumeClient({ resume: initial }: EditResumeClientProps) {
+interface EditResumeClientProps {
+  resumeId: string;
+}
+
+export function EditResumeClient({ resumeId }: EditResumeClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabKey>("personal");
-  const [resume, setResume] = useState<Resume>(initial);
+  const [resume, setResume] = useState<Resume | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
-  const updatePersonal = (data: Resume["personalInfo"]) =>
-    setResume((r) => ({ ...r, personalInfo: data }));
+  useEffect(() => {
+    getResume(resumeId).then((r) => {
+      if (!r) {
+        router.replace("/");
+        return;
+      }
+      setResume(r);
+      setLoading(false);
+    });
+  }, [resumeId, router]);
+
+  const persistResume = async (updated: Resume) => {
+    const withDate = { ...updated, lastEdited: todayString() };
+    setSaveStatus("saving");
+    await saveResume(withDate);
+    setResume(withDate);
+    setSaveStatus("saved");
+    setTimeout(() => setSaveStatus("idle"), 2000);
+  };
+
+  const updatePersonal = async (personalInfo: Resume["personalInfo"]) => {
+    if (!resume) return;
+    await persistResume({ ...resume, personalInfo });
+  };
+
+  const updateSection = async <K extends "education" | "experience" | "courses" | "projects">(
+    key: K,
+    value: Resume[K]
+  ) => {
+    if (!resume) return;
+    await persistResume({ ...resume, [key]: value });
+  };
+
+  const handleSaveClick = () => {
+    if (!resume || activeTab === "personal") return;
+    persistResume(resume);
+  };
+
+  if (loading || !resume) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-full">
+          <p className="font-body text-text-secondary text-[14px]">Loading…</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const SaveIcon = saveStatus === "saved" ? Check : Save;
+  const saveLabel =
+    saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved!" : "Save";
 
   return (
     <AppLayout>
@@ -61,11 +117,13 @@ export function EditResumeClient({ resume: initial }: EditResumeClientProps) {
             </Button>
             <Button
               variant="primary"
-              icon={Save}
-              form="personal-info-form"
+              icon={SaveIcon}
+              form={activeTab === "personal" ? "personal-info-form" : undefined}
               type={activeTab === "personal" ? "submit" : "button"}
+              onClick={activeTab !== "personal" ? handleSaveClick : undefined}
+              disabled={saveStatus === "saving"}
             >
-              Save
+              {saveLabel}
             </Button>
           </div>
         </div>
@@ -100,25 +158,25 @@ export function EditResumeClient({ resume: initial }: EditResumeClientProps) {
             {activeTab === "education" && (
               <EducationSection
                 items={resume.education}
-                onChange={(education) => setResume((r) => ({ ...r, education }))}
+                onChange={(education) => updateSection("education", education)}
               />
             )}
             {activeTab === "experience" && (
               <ExperienceSection
                 items={resume.experience}
-                onChange={(experience) => setResume((r) => ({ ...r, experience }))}
+                onChange={(experience) => updateSection("experience", experience)}
               />
             )}
             {activeTab === "courses" && (
               <CoursesSection
                 items={resume.courses}
-                onChange={(courses) => setResume((r) => ({ ...r, courses }))}
+                onChange={(courses) => updateSection("courses", courses)}
               />
             )}
             {activeTab === "projects" && (
               <ProjectsSection
                 items={resume.projects}
-                onChange={(projects) => setResume((r) => ({ ...r, projects }))}
+                onChange={(projects) => updateSection("projects", projects)}
               />
             )}
           </div>

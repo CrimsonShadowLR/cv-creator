@@ -2,7 +2,8 @@ export interface PersonalInfo {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phoneCode: string;
+  phoneNumber: string;
   city: string;
   country: string;
   summary: string;

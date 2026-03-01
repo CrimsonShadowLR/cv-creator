@@ -15,7 +15,7 @@ export function ResumePreview({ resume }: ResumePreviewProps) {
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
         <p className="text-[11px] text-text-secondary">
-          {personalInfo.email} | {personalInfo.phone}
+          {personalInfo.email} | {personalInfo.phoneCode} {personalInfo.phoneNumber}
         </p>
         <p className="text-[11px] text-text-secondary">
           {personalInfo.city}, {personalInfo.country}

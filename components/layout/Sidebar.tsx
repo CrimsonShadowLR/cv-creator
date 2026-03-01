@@ -19,15 +19,16 @@ export function Sidebar() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] shrink-0 bg-bg border-r border-border-subtle h-full px-4 py-6 gap-2 justify-between">
-      <div className="flex items-center gap-2.5 pb-6 px-0">
-        <FileText size={28} className="text-accent" />
-        <span className="font-heading text-[22px] font-bold text-text-primary">
-          ResumeForge
-        </span>
-      </div>
-
+    <aside className="hidden md:flex flex-col w-[260px] shrink-0 bg-bg border-r border-border-subtle h-full px-4 py-6 justify-between">
+      {/* Top: logo + nav items */}
       <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2.5 pb-6 px-0">
+          <FileText size={28} className="text-accent" />
+          <span className="font-heading text-[22px] font-bold text-text-primary">
+            ResumeForge
+          </span>
+        </div>
+
         {navItems.map(({ label, icon: Icon, href }) => {
           const active = isActive(href);
           return (
@@ -47,6 +48,7 @@ export function Sidebar() {
         })}
       </div>
 
+      {/* Bottom: theme toggle */}
       <div className="border-t border-border-subtle pt-3">
         <ThemeToggle />
       </div>
