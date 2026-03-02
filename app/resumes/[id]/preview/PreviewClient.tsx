@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Download, Pencil } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ResumePreview } from "@/components/resume/ResumePreview";
 import { getResume } from "@/lib/db";
+import { getTemplate } from "@/lib/templates";
+import { compileToPdf } from "@/lib/typst-client";
 import type { Resume } from "@/types/resume";
 
 interface PreviewClientProps {
@@ -14,20 +15,62 @@ interface PreviewClientProps {
 }
 
 export function PreviewClient({ resumeId }: PreviewClientProps) {
-  const router = useRouter();
   const [resume, setResume] = useState<Resume | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resumeNotFound, setResumeNotFound] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  async function handleDownloadPdf() {
+    if (!resume) return;
+    setDownloading(true);
+    try {
+      // Use the Momo template with English as the default for quick download.
+      // For full template + language control, use the Generate page.
+      const template = getTemplate("momo");
+      const typstSource = template.generate(resume, { lang: "en" });
+      const pdfBytes = await compileToPdf(typstSource);
+
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${resume.title || "resume"}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Failed to generate PDF. Please try again.",
+      );
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   useEffect(() => {
     getResume(resumeId).then((r) => {
       if (!r) {
-        router.replace("/");
+        setResumeNotFound(true);
         return;
       }
       setResume(r);
       setLoading(false);
     });
-  }, [resumeId, router]);
+  }, [resumeId]);
+
+  if (resumeNotFound) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center h-full gap-3">
+          <p className="font-body text-text-secondary text-[14px]">Resume not found.</p>
+          <Link href="/" className="font-body text-accent text-[14px] hover:underline">
+            Go to Dashboard
+          </Link>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (loading || !resume) {
     return (
@@ -45,7 +88,10 @@ export function PreviewClient({ resumeId }: PreviewClientProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border-subtle bg-bg shrink-0">
           <div className="flex items-center gap-2 md:gap-3">
-            <Link href="/" className="text-text-secondary hover:text-text-primary transition-colors">
+            <Link
+              href="/"
+              className="text-text-secondary hover:text-text-primary transition-colors"
+            >
               <ArrowLeft size={22} />
             </Link>
             <h1 className="font-heading text-[17px] md:text-[24px] font-bold text-text-primary">
@@ -66,10 +112,16 @@ export function PreviewClient({ resumeId }: PreviewClientProps) {
               <Pencil size={16} />
               Edit
             </Link>
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] bg-accent text-white font-body text-[13px] md:text-[14px] font-semibold hover:bg-indigo-600 transition-colors cursor-pointer">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={downloading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] bg-accent text-white font-body text-[13px] md:text-[14px] font-semibold hover:bg-indigo-600 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               <Download size={16} />
-              <span className="hidden md:inline">Download PDF</span>
-              <span className="md:hidden">PDF</span>
+              <span className="hidden md:inline">
+                {downloading ? "Generating…" : "Download PDF"}
+              </span>
+              <span className="md:hidden">{downloading ? "…" : "PDF"}</span>
             </button>
           </div>
         </div>

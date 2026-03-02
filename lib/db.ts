@@ -11,9 +11,9 @@ function migrateResume(raw: Record<string, unknown>): Resume {
       ...rest,
       phoneCode: match ? match[1] : "+1",
       phoneNumber: match ? match[2] : phone,
-    } as Resume;
+    } as unknown as Resume;
   }
-  return raw as Resume;
+  return raw as unknown as Resume;
 }
 
 const DB_NAME = "cv-helper-db";

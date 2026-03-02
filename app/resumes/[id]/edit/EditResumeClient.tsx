@@ -41,13 +41,34 @@ export function EditResumeClient({ resumeId }: EditResumeClientProps) {
   useEffect(() => {
     getResume(resumeId).then((r) => {
       if (!r) {
-        router.replace("/");
+        const blank: Resume = {
+          id: resumeId,
+          title: "Untitled Resume",
+          lastEdited: todayString(),
+          personalInfo: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            phoneCode: "",
+            phoneNumber: "",
+            city: "",
+            country: "",
+            summary: "",
+          },
+          education: [],
+          experience: [],
+          courses: [],
+          projects: [],
+        };
+        saveResume(blank);
+        setResume(blank);
+        setLoading(false);
         return;
       }
       setResume(r);
       setLoading(false);
     });
-  }, [resumeId, router]);
+  }, [resumeId]);
 
   const persistResume = async (updated: Resume) => {
     const withDate = { ...updated, lastEdited: todayString() };

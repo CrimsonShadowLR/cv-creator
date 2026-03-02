@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@myriaddreamin/typst-ts-renderer": "0.7.0-rc2",
+    "@myriaddreamin/typst-ts-web-compiler": "0.7.0-rc2",
+    "@myriaddreamin/typst.ts": "0.7.0-rc2",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "react": "19.2.3",
