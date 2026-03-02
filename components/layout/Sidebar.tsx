@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutDashboard, LayoutTemplate, Settings } from "lucide-react";
+import { FileText, LayoutDashboard, LayoutTemplate } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/" },
-  { label: "My Resumes", icon: FileText, href: "/resumes" },
   { label: "Templates", icon: LayoutTemplate, href: "/templates" },
-  { label: "Settings", icon: Settings, href: "/settings" },
 ];
 
 export function Sidebar() {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutDashboard, LayoutTemplate, Moon, Plus, Sun } from "lucide-react";
+import { LayoutDashboard, LayoutTemplate, Moon, Plus, Sun } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 export function MobileTabBar() {
@@ -17,10 +17,6 @@ export function MobileTabBar() {
       <Link href="/" className={`flex flex-col items-center gap-1 ${isActive("/") ? "text-accent" : "text-text-disabled"}`}>
         <LayoutDashboard size={22} strokeWidth={isActive("/") ? 2.5 : 2} />
         <span className="text-[11px] font-body font-medium">Home</span>
-      </Link>
-      <Link href="/resumes" className={`flex flex-col items-center gap-1 ${isActive("/resumes") ? "text-accent" : "text-text-disabled"}`}>
-        <FileText size={22} strokeWidth={isActive("/resumes") ? 2.5 : 2} />
-        <span className="text-[11px] font-body font-medium">Resumes</span>
       </Link>
       <Link href="/resumes/new" className="flex flex-col items-center gap-1">
         <span className="flex items-center justify-center w-11 h-11 rounded-full bg-accent text-white">
