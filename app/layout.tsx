@@ -27,6 +27,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6354492919981639"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
