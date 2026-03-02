@@ -1,6 +1,5 @@
 import type { Resume } from "@/types/resume";
 import { generateMomoTypst, type Lang } from "./momo";
-import { generateClassicTypst } from "./classic";
 
 export type { Lang };
 
@@ -28,16 +27,6 @@ export const TEMPLATES: TemplateInfo[] = [
     accentColor: "#4C8C7A",
     supportsLang: true,
     generate: (resume, { lang }) => generateMomoTypst(resume, lang),
-  },
-  {
-    id: "classic",
-    name: "Classic",
-    description:
-      "Clean, minimal layout with a two-column header and simple indigo section dividers.",
-    fontLabel: "System Default",
-    accentColor: "#5855D6",
-    supportsLang: false,
-    generate: (resume) => generateClassicTypst(resume),
   },
 ];
 
